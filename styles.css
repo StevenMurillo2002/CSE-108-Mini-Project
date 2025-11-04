@@ -1,0 +1,50 @@
+h1{
+    justify-self: center;
+    margin-top: 5%;
+}
+
+body{
+    margin:0;
+    padding: 0;
+    background-color: rgb(143, 250, 129);
+}
+
+
+.container{
+    width: 430px;
+    margin: 130px auto;
+    position: relative;
+
+    padding: 25px 0 30px 25px;
+    background: rgb(171, 43, 43);
+    border-bottom: 1px solid black;
+    border-radius: 2rem;
+
+}
+
+.login-text{
+    font-size: 20px;    
+    color:white;
+    text-align: center;
+    
+}
+
+.container form{
+    display: grid;
+    gap: 5px;
+    padding-left: auto;
+    width: 200px;
+}
+
+.login-detail{
+    color: white;
+    font-size: 20px;
+}
+
+.login-button{
+    margin-top: 10%;
+    width: 200px;
+    height: 50px;
+    background-color: rgb(126, 146, 245);
+
+}
