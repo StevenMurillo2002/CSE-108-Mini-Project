@@ -10,17 +10,29 @@ db = SQLAlchemy(app)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
-    password = db.Column(db.String, unique=True, nullable=False)
+    password = db.Column(db.String, unique=False, nullable=False)
+
+class Classes(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    coursenumber = db.Column(db.Integer, unique=True, nullable=False)
+    name = db.Column(db.String, unique=True, nullable=False)
+    professor = db.Column(db.String, unique=False, nullable=True)
+
+
+
 
 from flask_admin.contrib.sqla import ModelView
 app.secret_key = 'super secret key'
 
 admin = Admin(app, name='microblog')
 admin.add_view(ModelView(User,db.session))
+admin.add_view(ModelView(Classes, db.session))
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-
-app.run()
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
