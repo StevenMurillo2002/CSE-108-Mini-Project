@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 from flask_admin import Admin
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin, LoginManager, current_user, login_required, login_user
+from flask_login import UserMixin, LoginManager, current_user, login_required, login_user, logout_user
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
@@ -91,6 +91,12 @@ def login():
             return redirect(url_for('student_courses'))
 
     return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()  
+    return redirect(url_for('login'))
 
 @app.route('/student/courses')
 @login_required
