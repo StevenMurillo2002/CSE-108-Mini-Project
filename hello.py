@@ -34,7 +34,7 @@ class Classes(db.Model):
 from flask_admin.contrib.sqla import ModelView
 app.secret_key = 'super secret key'
 
-admin = Admin(app, name='microblog')
+admin = Admin(app, name='Admin View')
 admin.add_view(ModelView(User,db.session))
 admin.add_view(ModelView(Classes, db.session))
 
