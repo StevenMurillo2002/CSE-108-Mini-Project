@@ -1,17 +1,34 @@
 from flask_sqlalchemy import SQLAlchemy 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect, url_for
 from flask_admin import Admin
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin, LoginManager, current_user, login_required, login_user
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 db = SQLAlchemy(app)
 
-class User(db.Model):
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+app.secret_key = 'keep it secret, keep it safe'
+
+
+enrollment_table = db.Table('enrollment',
+db.Column('student_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+db.Column('course_id', db.Integer, db.ForeignKey('course.id'), primary_key=True))
+
+
+
+
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), unique=False, nullable=False)
-
+    password_hash = db.Column(db.String(128), nullable=False)
+    name = db.Column(db.String(64), nullable=False)
+    role = db.Column(db.String(64), nullable=False)
+    classenrolled = db.relationship('Course', secondary=enrollment_table, backref=db.backref('students', lazy='dynamic'), lazy='dynamic')
 
     def password(self,password):
         self.password_hash = generate_password_hash(password)
@@ -22,12 +39,26 @@ class User(db.Model):
 
 
 
-class Classes(db.Model):
+class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    coursenumber = db.Column(db.Integer, unique=True, nullable=False)
-    name = db.Column(db.String, unique=True, nullable=False)
-    professor = db.Column(db.String, unique=False, nullable=True)
+    name = db.Column(db.String(64), nullable=False)
+    professorID = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    professor = db.relationship('User', foreign_keys=[professorID], backref='courses_taught') 
+    time = db.Column(db.String(64),nullable=False)
+    capacity = db.Column(db.Integer, nullable=False)
 
+    def get_student_count(self):
+        return self.students.count()
+
+    
+    # def is_full(self):
+    #     self.capacity = capacity
+        
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 
@@ -36,11 +67,35 @@ app.secret_key = 'super secret key'
 
 admin = Admin(app, name='microblog')
 admin.add_view(ModelView(User,db.session))
-admin.add_view(ModelView(Classes, db.session))
+admin.add_view(ModelView(Course, db.session))
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return redirect(url_for('login'))
+
+
+@app.route('/login', methods=["GET","POST"])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('student_courses'))
+    
+    if request.method == "POST":
+        username = request.form.get('username')
+        password = request.form.get('password')
+        print(username, password)
+        user = User.query.filter_by(username=username).first()
+        if user is None or not user.verify(password):
+            return redirect(url_for('login'))
+        if user and user.verify(password):
+            login_user(user)
+            return redirect(url_for('student_courses'))
+
+    return render_template('login.html')
+
+@app.route('/student/courses')
+@login_required
+def student_courses():
+    return render_template('student_courses.html')
 
 
 

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Lab 8 Project</title>
+        <link rel="stylesheet" href="/static/styles.css">
+    </head>
+
+    <body>
+        <h1> Shrek University</h1>
+        <div class="container">
+            <div class="login-text">
+                <h1>Login Page</h1>
+            </div>
+            <br>
+
+            <form method="POST" action="{{url_for('login')}}">
+                <p class="login-detail"> Username</p>
+                <input type="text" placeholder="Enter username" name="username">
+                <p class="login-detail"> Password</p>
+                <input type="password" placeholder="Enter password" name="password">
+                <button class="login-button" type="submit"> Log In</button>
+            </form>
+
+            
+        </div>
+    </body>
+</html>
