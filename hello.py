@@ -101,7 +101,8 @@ def logout():
 @app.route('/student/courses')
 @login_required
 def student_courses():
-    return render_template('student_courses.html')
+    allcourses = current_user.classenrolled.all()
+    return render_template('student_courses.html', courses=allcourses)
 
 
 
