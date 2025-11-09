@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>All Classes</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <h1>All Classes</h1>
+    <table>
+      <tr>
+        <th>Course</th>
+        <th>Professor</th>
+        <th>Time</th>
+        <th>Enrolled</th>
+        <th>Capacity</th>
+      </tr>
+      {% for c in courses %}
+      <tr>
+        <td>{{ c.name }}</td>
+        <td>{{ c.professor }}</td>
+        <td>{{ c.time }}</td>
+        <td>{{ c.enrolled }}</td>
+        <td>{{ c.capacity }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <form method="get" action="{{ url_for('student_courses') }}">
+      <button class="login-button" type="submit">Back to My Courses</button>
+    </form>
+  </body>
+</html>

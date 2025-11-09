@@ -40,7 +40,9 @@
 
     </table>
 
-
+    <form method="get" action="{{ url_for('view_all_classes') }}">
+  <button class="login-button" type="submit">View All Classes</button>
+        </form>
 
     <form action="{{ url_for('logout') }}" method="GET">
         <button type="submit">Log Out</button>
