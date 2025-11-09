@@ -17,6 +17,10 @@ with app.app_context():
     db.session.add(ProfessorKyrilov)
     db.session.commit()
 
+    AdminAccount = User(username = "Admin45", password_hash=generate_password_hash("Admin123"), name="Admin", role="admin")
+    db.session.add(AdminAccount)
+    db.session.commit()
+
 
     Course1 = Course(name="Math101", professorID=ProfessorAdam.id, time="MWF 10:00am-11:30am", capacity=100)
     db.session.add(Course1)
