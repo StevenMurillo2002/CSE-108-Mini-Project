@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy 
-from flask import Flask, render_template, jsonify, request, redirect, url_for
+from flask import Flask, render_template, jsonify, request, redirect, url_for, flash
 from flask_admin import Admin
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, LoginManager, current_user, login_required, login_user, logout_user
@@ -104,36 +104,60 @@ def student_courses():
     allcourses = current_user.classenrolled.all()
     return render_template('student_courses.html', courses=allcourses)
 
+# @app.route("/classes")
+# def view_all_classes():
+#     courses = Course.query.all()
+#     data = [{
+#         "name": c.name,
+#         "professor": c.professor.name if c.professor else "TBA",
+#         "time": c.time,
+#         "enrolled": c.get_student_count(),
+#         "capacity": c.capacity
+#     } for c in courses]
+#     return render_template("classes.html", courses=data)
+
 @app.route("/classes")
 def view_all_classes():
     courses = Course.query.all()
-    data = [{
-        "name": c.name,
-        "professor": c.professor.name if c.professor else "TBA",
-        "time": c.time,
-        "enrolled": c.get_student_count(),
-        "capacity": c.capacity
-    } for c in courses]
-    return render_template("classes.html", courses=data)
-
-@app.route('/student/enroll<int:course_id>', methods=['POST'])
+    return render_template("classes.html", courses=courses)
+    
+@app.route('/student/add/<int:course_id>', methods=['POST'])
 @login_required
-def add_courses(course_id):
+def add_course(course_id):
     course = Course.query.get_or_404(course_id)
 
     # Check if enrolled already
     if current_user in course.students:
+        flash('You are already enrolled in this course.', 'warning')
         return redirect(url_for('view_all_classes'))
     
     # Check if full
     if course.students.count() >= course.capacity:
+        flash('Course Full.', 'alert')
         return redirect(url_for('view_all_classes'))
     
     # Enroll student
     course.students.append(current_user)
+    flash('Enrolled Successfully!', 'success')
     db.session.commit()
     
     return redirect(url_for('view_all_classes'))
+
+@app.route('/student/drop/<int:course_id>', methods=['POST'])
+@login_required
+def drop_course(course_id):
+    course = Course.query.get_or_404(course_id)
+    
+    # Check if enrolled already
+    if current_user in course.students:
+        course.students.remove(current_user)
+        flash('Dropped Successfully!', 'success')
+        db.session.commit()
+    else:
+        flash('Course not Dropped', 'alert')
+        
+    return redirect(url_for('view_all_classes'))
+
 
 # @app.route('/teacher/dashboard')
 # @login_required

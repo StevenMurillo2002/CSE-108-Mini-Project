@@ -17,8 +17,11 @@ with app.app_context():
     db.session.add(ProfessorKyrilov)
     db.session.commit()
 
+    ProfessorKen = User(username = "Ken67", password_hash=generate_password_hash("WeLuvKen"), name="Ken", role="teacher")
+    db.session.add(ProfessorKen)
+    db.session.commit()
 
-    Course1 = Course(name="Math101", professorID=ProfessorAdam.id, time="MWF 10:00am-11:30am", capacity=100)
+    Course1 = Course(name="Math101", professorID=ProfessorAdam.id, time="MWF 10:00am - 11:30am", capacity=100)
     db.session.add(Course1)
     db.session.commit()
 
@@ -30,5 +33,8 @@ with app.app_context():
 
     Course2.students.append(Max)
 
+    Course3 = Course(name="CSE100", professorID=ProfessorKen.id, time="TR 1:00am - 2:15am", capacity=0)
+    db.session.add(Course3)
+    db.session.commit()
 
     db.session.commit()
