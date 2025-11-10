@@ -11,18 +11,16 @@
         <th>Course</th>
         <th>Professor</th>
         <th>Time</th>
-        <th>Enrolled</th>
-        <th>Capacity</th>
+        <th>Students Enrolled</th>
       </tr>
-      {% for c in courses %}
-      <tr>
-        <td>{{ c.name }}</td>
-        <td>{{ c.professor }}</td>
-        <td>{{ c.time }}</td>
-        <td>{{ c.enrolled }}</td>
-        <td>{{ c.capacity }}</td>
-      </tr>
-      {% endfor %}
+        {% for c in courses %}
+        <tr>
+          <td>{{ c.name }}</td>
+          <td>{{ c.professor }}</td>
+          <td>{{ c.time }}</td>
+          <td>{{ c.enrolled }} / {{ c.capacity }}</td>
+        </tr>
+        {% endfor %}
     </table>
 
     <form method="get" action="{{ url_for('student_courses') }}">

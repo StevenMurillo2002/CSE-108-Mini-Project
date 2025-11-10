@@ -116,7 +116,29 @@ def view_all_classes():
     } for c in courses]
     return render_template("classes.html", courses=data)
 
+@app.route('/student/enroll<int:course_id>', methods=['POST'])
+@login_required
+def add_courses(course_id):
+    course = Course.query.get_or_404(course_id)
 
+    # Check if enrolled already
+    if current_user in course.students:
+        return redirect(url_for('view_all_classes'))
+    
+    # Check if full
+    if course.students.count() >= course.capacity:
+        return redirect(url_for('view_all_classes'))
+    
+    # Enroll student
+    course.students.append(current_user)
+    db.session.commit()
+    
+    return redirect(url_for('view_all_classes'))
+
+# @app.route('/teacher/dashboard')
+# @login_required
+# def teach_dash():
+    
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
