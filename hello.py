@@ -104,18 +104,6 @@ def student_courses():
     allcourses = current_user.classenrolled.all()
     return render_template('student_courses.html', courses=allcourses)
 
-# @app.route("/classes")
-# def view_all_classes():
-#     courses = Course.query.all()
-#     data = [{
-#         "name": c.name,
-#         "professor": c.professor.name if c.professor else "TBA",
-#         "time": c.time,
-#         "enrolled": c.get_student_count(),
-#         "capacity": c.capacity
-#     } for c in courses]
-#     return render_template("classes.html", courses=data)
-
 @app.route("/classes")
 def view_all_classes():
     courses = Course.query.all()
