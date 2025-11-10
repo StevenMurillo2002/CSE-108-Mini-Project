@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>All Classes</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <!-- Render Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <h1>All Classes</h1>
+    <table>
+      <tr>
+        <th>Course</th>
+        <th>Professor</th>
+        <th>Time</th>
+        <th>Students Enrolled</th>
+        <th>Add / Drop</th>
+      </tr>
+        {% for c in courses %}
+        <tr>
+          <td>{{ c.name }}</td>
+          <td>{{ c.professor }}</td>
+          <td>{{ c.time }}</td>
+          <td>{{ c.students.count() }} / {{ c.capacity }}</td>
+          <td>
+            {% if current_user in c.students %}
+              <form action="{{ url_for('drop_course', course_id=c.id) }}" method="POST" style="display:inline;">
+                <button type="submit" title="Remove from class">&#8722;</button> <!-- minus sign -->
+              </form>
+            {% elif c.students.count() < c.capacity %}
+              <form action="{{ url_for('add_course', course_id=c.id) }}" method="POST" style="display:inline;">
+                <button type="submit" title="Add to class">&#43;</button> <!-- plus sign -->
+              </form>
+            {% else %}
+              <button type="button" disabled>&#43;</button> <!-- Disabled if full -->
+            {% endif %}
+          </td>          
+        </tr>
+        {% endfor %}
+    </table>
+
+    <form method="get" action="{{ url_for('student_courses') }}">
+      <button class="login-button" type="submit">Back to My Courses</button>
+    </form>
+  </body>
+</html>
