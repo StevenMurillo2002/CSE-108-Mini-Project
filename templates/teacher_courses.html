@@ -11,37 +11,26 @@
     <table>
         <thead>
             <tr>
-                <th>
-                    Course
-                </th>
-                <th>
-                    Time
-                </th>
-                <th>
-                    Capacity
-                </th>
+                <th>Course</th>
+                <th>Teacher</th>
+                <th>Time</th>
+                <th>Students Enrolled</th>
             </tr>
         </thead>
-
         <tbody>
             <tr>
                 {% for c in courses %}
                 <td>{{c.name}}</td>
-                <td>{{c.time}}</td>
-                <td>{{c.capacity}}</td>
+                <td>{{ c.professor.name }}</td>
+                <td>{{ c.time }}</td>
+                <td>{{ c.students.count() }} / {{ c.capacity }}</td>
             </tr>
                 {% endfor %}
         </tbody>
-
-
     </table>
-
-
 
     <form action="{{ url_for('logout') }}" method="GET">
         <button type="submit">Log Out</button>
     </form>
-
-
 </body>
 </html>
