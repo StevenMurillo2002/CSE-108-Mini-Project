@@ -11,7 +11,7 @@
 
     {% block content %}
     
-    <h1>Student Courses</h1>
+    <h1>Your Courses</h1>
 
     <table>
         <thead>
@@ -37,7 +37,7 @@
     </table>
 
     <form method="get" action="{{ url_for('view_all_classes') }}">
-  <button class="login-button" type="submit">View All Classes</button>
+  <button class="login-button" type="submit">View All Courses</button>
         </form>
 
     <form action="{{ url_for('logout') }}" method="GET">
