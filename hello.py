@@ -89,6 +89,7 @@ def login():
         print(username, password)
         user = User.query.filter_by(username=username).first()
         if user is None or not user.verify(password):
+            flash('Login failed, try again.', 'alert')
             return redirect(url_for('login'))
         if user and user.verify(password):
             login_user(user)

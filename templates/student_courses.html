@@ -6,6 +6,11 @@
 </head>
 
 <body>
+    {% extends "base.html" %}
+    {% block title %}Student Courses{% endblock %}
+
+    {% block content %}
+    
     <h1>Student Courses</h1>
 
     <table>
@@ -17,7 +22,6 @@
                 <th>Students Enrolled</th>
             </tr>
         </thead>
-
         <tbody>
             {% for c in courses %}
             <tr>
@@ -40,6 +44,6 @@
         <button type="submit">Log Out</button>
     </form>
 
-
+    {% endblock %}
 </body>
 </html>
