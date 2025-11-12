@@ -112,12 +112,6 @@ def student_courses():
     allcourses = current_user.classenrolled.all()
     return render_template('student_courses.html', courses=allcourses)
 
-# @app.route('/teacher/courses')
-# @login_required
-# def teacher_courses():
-#     courses = current_user.courses_taught
-#     return render_template('teacher_courses.html', courses=courses)
-
 @app.route("/classes")
 def view_all_classes():
     courses = Course.query.all()
