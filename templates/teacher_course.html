@@ -8,7 +8,6 @@
   <div class="topbar">
     <a href="{{ url_for('teacher_courses') }}">&#8592; Back</a>
     <span>{{ course.name }}</span>
-    <a href="{{ url_for('logout') }}">Sign out</a>
   </div>
 
   <h1>{{ course.name }}</h1>
@@ -43,5 +42,9 @@
     </tbody>
   </table>
   {% endif %}
+  <form action="{{ url_for('logout') }}" method="GET">
+    <button type="submit">Log Out</button>
+  </form>
+
 </body>
 </html>
