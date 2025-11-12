@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="/static/styles.css">
+  <title>Your Courses</title>
 </head>
-
 <body>
     {% extends "base.html" %}
     {% block title %}Teacher Courses{% endblock %}
 
     {% block content %}
     
-    <h1>Teacher Courses</h1>
 
     <table>
         <thead>
@@ -25,7 +23,7 @@
         <tbody>
             {% for c in courses %}
             <tr>
-                <td>{{c.name}}</td>
+                <td><a href="{{ url_for('teacher_course', course_id=c.id) }}">{{ c.name }}</a></td>
                 <td>{{ c.professor.name }}</td>
                 <td>{{ c.time }}</td>
                 <td>{{ c.students.count() }} / {{ c.capacity }}</td>

@@ -3,6 +3,8 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for, f
 from flask_admin import Admin
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, LoginManager, current_user, login_required, login_user, logout_user
+from sqlalchemy import select, and_
+
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
@@ -17,10 +19,9 @@ app.secret_key = 'keep it secret, keep it safe'
 
 enrollment_table = db.Table('enrollment',
 db.Column('student_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-db.Column('course_id', db.Integer, db.ForeignKey('course.id'), primary_key=True))
-
-
-
+db.Column('course_id', db.Integer, db.ForeignKey('course.id'), primary_key=True),
+db.Column('grade', db.String(8))
+)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -53,7 +54,6 @@ class Course(db.Model):
     
     # def is_full(self):
     #     self.capacity = capacity
-        
 
 
 @login_manager.user_loader
@@ -112,11 +112,11 @@ def student_courses():
     allcourses = current_user.classenrolled.all()
     return render_template('student_courses.html', courses=allcourses)
 
-@app.route('/teacher/courses')
-@login_required
-def teacher_courses():
-    courses = current_user.courses_taught
-    return render_template('teacher_courses.html', courses=courses)
+# @app.route('/teacher/courses')
+# @login_required
+# def teacher_courses():
+#     courses = current_user.courses_taught
+#     return render_template('teacher_courses.html', courses=courses)
 
 @app.route("/classes")
 def view_all_classes():
@@ -160,10 +160,64 @@ def drop_course(course_id):
         
     return redirect(url_for('view_all_classes'))
 
-@app.route('/teacher/course/<int:course_id>/students')
+
+@app.route('/teacher/courses')
 @login_required
-def student_grades(course_id, student_id):
-    return redirect(url_for('teacher_class_students', course_id=course_id))
+def teacher_courses():
+    if current_user.role == 'student':
+        flash('Unauthorized: No permission.', 'alert')
+        return redirect(url_for('student_courses'))
+    courses = Course.query.filter_by(professorID=current_user.id).all()
+    return render_template('teacher_courses.html', courses=courses)
+
+
+@app.route('/teacher/course/<int:course_id>', methods=['GET', 'POST'])
+@login_required
+def teacher_course(course_id):
+    # must be a teacher and must own this course
+    if current_user.role != 'teacher':
+        flash('Unauthorized: teachers only.', 'alert')
+        return redirect(url_for('student_courses'))
+
+    course = Course.query.get_or_404(course_id)
+    if course.professorID != current_user.id:
+        flash('You do not teach this course.', 'alert')
+        return redirect(url_for('teacher_courses'))
+
+    if request.method == 'POST':
+        student_id = int(request.form['student_id'])
+        grade = (request.form.get('grade') or '').strip()
+
+        # ensure the student is actually enrolled
+        exists = db.session.execute(
+            select(enrollment_table.c.student_id)
+            .where(and_(enrollment_table.c.student_id == student_id,
+                        enrollment_table.c.course_id  == course_id))
+        ).first()
+        if not exists:
+            flash('Student is not enrolled in this course.', 'alert')
+            return redirect(url_for('teacher_course', course_id=course_id))
+
+        # update the grade in the enrollment row
+        db.session.execute(
+            enrollment_table.update()
+            .where(and_(enrollment_table.c.student_id == student_id,
+                        enrollment_table.c.course_id  == course_id))
+            .values(grade=grade if grade else None)
+        )
+        db.session.commit()
+        flash('Grade saved!')
+        return redirect(url_for('teacher_course', course_id=course_id))
+
+    # build grades_map from the enrollment table for this course
+    rows = db.session.execute(
+        select(enrollment_table.c.student_id, enrollment_table.c.grade)
+        .where(enrollment_table.c.course_id == course_id)
+    ).fetchall()
+    grades_map = {(sid, course_id): g for (sid, g) in rows}
+
+    return render_template('teacher_course.html', course=course, grades_map=grades_map)
+
 
 if __name__ == "__main__":
     with app.app_context():
