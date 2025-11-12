@@ -5,46 +5,41 @@
   <title>{{ course.name }}</title>
 </head>
 <body>
-  <div class="topbar">
-    <a href="{{ url_for('teacher_courses') }}">&#8592; Back</a>
-    <span>{{ course.name }}</span>
-  </div>
+    <div class="topbar">
+        <a href="{{ url_for('teacher_courses') }}">&#8592; Back</a>
+    </div>
 
   <h1>{{ course.name }}</h1>
 
   {% if course.students.count() == 0 %}
-    <p>No students enrolled.</p>
+  <p>No students enrolled.</p>
   {% else %}
-  <table>
-    <thead>
-      <tr>
-        <th>Student Name</th>
-        <th>Grade</th>
-        <th>Save</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for s in course.students %}
-      {% set g = grades_map.get((s.id, course.id)) %}
-      <tr>
-        <td>{{ s.name }}</td>
-        <td>
-          <form method="post" action="{{ url_for('teacher_course', course_id=course.id) }}">
-            <input type="hidden" name="student_id" value="{{ s.id }}">
-            <input type="text"   name="grade" value="{{ g if g is not none else '' }}" placeholder="e.g., 92 or A-">
-        </td>
-        <td>
-            <button type="submit">Save</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% endif %}
-  <form action="{{ url_for('logout') }}" method="GET">
-    <button type="submit">Log Out</button>
-  </form>
-
+  <form method="post" action="{{ url_for('teacher_course', course_id=course.id) }}">
+    <table>
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in course.students %}
+            {% set g = grades_map.get((s.id, course.id)) %}
+            <tr>
+                <td>{{ s.name }}</td>
+                <td>
+                    <input type="hidden" name="student_id" value="{{ s.id }}">
+                    <input type="text"   name="grade" value="{{ g if g is not none else '' }}" placeholder="e.g., 92 or A-">
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit">Save</button>
+    </form>
+    {% endif %}
+    <form action="{{ url_for('logout') }}" method="GET">
+        <button type="submit">Log Out</button>
+    </form>
 </body>
 </html>
