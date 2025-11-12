@@ -6,6 +6,12 @@
     </head>
 
     <body>
+        {% extends "base.html" %}
+        {% block title %}Login Page{% endblock %}
+
+        {% block content %}
+        
+        
         <h1> Blue University</h1>
         <div class="container">
             <div class="login-text">
@@ -20,10 +26,8 @@
                 <input type="password" placeholder="Enter password" name="password">
                 <button class="login-button" type="submit"> Log In</button>
             </form>
-
             
-            
-
         </div>
+        {% endblock %}
     </body>
 </html>

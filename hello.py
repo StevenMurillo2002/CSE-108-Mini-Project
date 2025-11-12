@@ -76,19 +76,27 @@ def index():
 
 @app.route('/login', methods=["GET","POST"])
 def login():
-    if current_user.is_authenticated:
+    # Already logged in
+    if current_user.is_authenticated and current_user.role == 'student':
         return redirect(url_for('student_courses'))
+    elif current_user.is_authenticated and current_user.role == 'teacher':
+        return redirect(url_for('teacher_courses'))
     
+    # Login
     if request.method == "POST":
         username = request.form.get('username')
         password = request.form.get('password')
         print(username, password)
         user = User.query.filter_by(username=username).first()
         if user is None or not user.verify(password):
+            flash('Login failed, try again.', 'alert')
             return redirect(url_for('login'))
         if user and user.verify(password):
             login_user(user)
-            return redirect(url_for('student_courses'))
+            if user.role == 'student':
+                return redirect(url_for('student_courses'))
+            elif user.role == 'teacher':
+                return redirect(url_for('teacher_courses'))
 
     return render_template('login.html')
 
@@ -103,6 +111,12 @@ def logout():
 def student_courses():
     allcourses = current_user.classenrolled.all()
     return render_template('student_courses.html', courses=allcourses)
+
+@app.route('/teacher/courses')
+@login_required
+def teacher_courses():
+    courses = current_user.courses_taught
+    return render_template('teacher_courses.html', courses=courses)
 
 @app.route("/classes")
 def view_all_classes():
@@ -146,11 +160,11 @@ def drop_course(course_id):
         
     return redirect(url_for('view_all_classes'))
 
+@app.route('/teacher/course/<int:course_id>/students')
+@login_required
+def student_grades(course_id, student_id):
+    return redirect(url_for('teacher_class_students', course_id=course_id))
 
-# @app.route('/teacher/dashboard')
-# @login_required
-# def teach_dash():
-    
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
