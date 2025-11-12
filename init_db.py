@@ -8,6 +8,9 @@ with app.app_context():
     Max = User(username = "Max10", password_hash=generate_password_hash("Max123"), name="Max",role="student")
     db.session.add(Max)
 
+    Steven = User(username="Steven10", password_hash=generate_password_hash("Steven123"), name="Steven", role="student")
+    db.session.add(Steven)
+    
     # Teachers
     ProfessorAdam = User(username = "Adam2", password_hash=generate_password_hash("Adam123"), name="Adam",role="teacher")
     db.session.add(ProfessorAdam)

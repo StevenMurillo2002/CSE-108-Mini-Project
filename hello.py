@@ -36,6 +36,14 @@ class User(UserMixin, db.Model):
 
     def verify(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    def __repr__(self):
+        # what Flask-Admin will show for relationships
+        return self.name      # or f"{self.name} ({self.username})"
+
+    # (optional but nice)
+    def __str__(self):
+        return self.name
         
 
 
@@ -81,6 +89,8 @@ def login():
         return redirect(url_for('student_courses'))
     elif current_user.is_authenticated and current_user.role == 'teacher':
         return redirect(url_for('teacher_courses'))
+    elif current_user.is_authenticated and current_user.role == "admin":
+        return redirect(url_for('admin.index'))
     
     # Login
     if request.method == "POST":
@@ -97,6 +107,8 @@ def login():
                 return redirect(url_for('student_courses'))
             elif user.role == 'teacher':
                 return redirect(url_for('teacher_courses'))
+            elif user.role == 'admin':
+                return redirect(url_for('admin.index'))
 
     return render_template('login.html')
 
@@ -181,6 +193,7 @@ def teacher_course(course_id):
     if request.method == 'POST':
         student_id = int(request.form['student_id'])
         grade = (request.form.get('grade') or '').strip()
+        print(grade)
 
         # ensure the student is actually enrolled
         exists = db.session.execute(
@@ -209,8 +222,12 @@ def teacher_course(course_id):
         .where(enrollment_table.c.course_id == course_id)
     ).fetchall()
     grades_map = {(sid, course_id): g for (sid, g) in rows}
+    print(grades_map)
 
     return render_template('teacher_course.html', course=course, grades_map=grades_map)
+
+# @app.route('/admin')
+# @login_required
 
 
 if __name__ == "__main__":
