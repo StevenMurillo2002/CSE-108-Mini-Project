@@ -35,8 +35,13 @@
             <tr>
                 <td>{{ s.name }}</td>
                 <td>
-                    <input type="hidden" name="student_id" value="{{ s.id }}">
-                    <input type="text"   name="grade" value="{{ g if g is not none else '' }}" placeholder="e.g., 92 or A-">
+                    <!-- <input type="hidden" name="student_id" value="{{ s.id }}">
+                    <input type="text"   name="grade" value="{{ g if g is not none else '' }}" placeholder="e.g., 92 or A-"> -->
+                    <input
+                    type="text" 
+                    name="grade_{{ s.id }}" 
+                    value="{{ g if g is not none else '' }}" 
+                    placeholder="e.g., 92 or A-">
                 </td>
             </tr>
             {% endfor %}

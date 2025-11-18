@@ -190,30 +190,47 @@ def teacher_course(course_id):
         flash('You do not teach this course.', 'alert')
         return redirect(url_for('teacher_courses'))
 
+    # if request.method == 'POST':
+    #     student_id = int(request.form['student_id'])
+    #     grade = (request.form.get('grade') or '').strip()
+    #     print(grade)
+
+    #     # ensure the student is actually enrolled
+    #     exists = db.session.execute(
+    #         select(enrollment_table.c.student_id)
+    #         .where(and_(enrollment_table.c.student_id == student_id,
+    #                     enrollment_table.c.course_id  == course_id))
+    #     ).first()
+    #     if not exists:
+    #         flash('Student is not enrolled in this course.', 'alert')
+    #         return redirect(url_for('teacher_course', course_id=course_id))
+
+    #     # update the grade in the enrollment row
+    #     db.session.execute(
+    #         enrollment_table.update()
+    #         .where(and_(enrollment_table.c.student_id == student_id,
+    #                     enrollment_table.c.course_id  == course_id))
+    #         .values(grade=grade if grade else None)
+    #     )
+    #     db.session.commit()
+    #     flash('Grade saved!')
+    #     return redirect(url_for('teacher_course', course_id=course_id))
+    
     if request.method == 'POST':
-        student_id = int(request.form['student_id'])
-        grade = (request.form.get('grade') or '').strip()
-        print(grade)
-
-        # ensure the student is actually enrolled
-        exists = db.session.execute(
-            select(enrollment_table.c.student_id)
-            .where(and_(enrollment_table.c.student_id == student_id,
-                        enrollment_table.c.course_id  == course_id))
-        ).first()
-        if not exists:
-            flash('Student is not enrolled in this course.', 'alert')
-            return redirect(url_for('teacher_course', course_id=course_id))
-
-        # update the grade in the enrollment row
-        db.session.execute(
-            enrollment_table.update()
-            .where(and_(enrollment_table.c.student_id == student_id,
-                        enrollment_table.c.course_id  == course_id))
-            .values(grade=grade if grade else None)
-        )
+        for student in course.students:
+            grade_field = f'grade_{student.id}'
+            grade = request.form.get(grade_field, '').strip()
+            db.session.execute(
+                enrollment_table.update()
+                .where(
+                    (enrollment_table.c.student_id == student.id) & 
+                    (enrollment_table.c.course_id == course_id)
+                )
+                .values(grade=grade if grade else None)
+            )
         db.session.commit()
-        flash('Grade saved!')
+        flash('All grades saved!')
+
         return redirect(url_for('teacher_course', course_id=course_id))
 
     # build grades_map from the enrollment table for this course
