@@ -10,6 +10,12 @@ with app.app_context():
 
     Steven = User(username="Steven10", password_hash=generate_password_hash("Steven123"), name="Steven", role="student")
     db.session.add(Steven)
+
+    Ian = User(username="Ian10", password_hash=generate_password_hash("Ian123"), name="Ian", role="student")
+    db.session.add(Ian)
+    
+    Chris = User(username="Chris10", password_hash=generate_password_hash("Chris123"), name="Chris", role="student")
+    db.session.add(Chris)
     
     # Teachers
     ProfessorAdam = User(username = "Adam2", password_hash=generate_password_hash("Adam123"), name="Adam",role="teacher")
@@ -37,6 +43,9 @@ with app.app_context():
     db.session.add(Course1)
 
     Course1.students.append(Max)
+    Course1.students.append(Steven)
+    Course1.students.append(Ian)
+    Course1.students.append(Chris)
 
     Course2 = Course(name="CSE 15", professorID=ProfessorKyrilov.id, time="TR 9:00am - 10:15am", capacity=105)
     db.session.add(Course2)
