@@ -46,6 +46,10 @@
       <button class="login-button" type="submit">Back to My Courses</button>
     </form>
     
+    <form action="{{ url_for('logout') }}" method="GET">
+        <button type="submit">Log Out</button>
+    </form>
+    
     {% endblock %}
   </body>
 </html>

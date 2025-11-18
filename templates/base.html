@@ -7,9 +7,18 @@
 </head>
 <body>
     <!-- Welcome message -->
-    {% if current_user.is_authenticated %}
-        <p>Welcome, {{ current_user.name }}!</p>
-    {% endif %}
+    <div class="topbar">
+        <div class="welcome-message">
+            {% if current_user.is_authenticated %}
+                <p>Welcome, {{ current_user.name }}!</p>
+                <!-- <div class="logout-button">
+                    <form action="{{ url_for('logout') }}" method="GET" style="display: inline;">
+                        <button type="submit">Log Out</button>
+                    </form>
+                </div> -->
+            {% endif %}
+        </div>
+    </div>
 
     <!-- Render Flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
