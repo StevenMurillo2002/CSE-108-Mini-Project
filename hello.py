@@ -1,9 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy 
 from flask import Flask, render_template, jsonify, request, redirect, url_for, flash
-from flask_admin import Admin
+from flask_admin import Admin 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, LoginManager, current_user, login_required, login_user, logout_user
 from sqlalchemy import select, and_
+from wtforms import PasswordField
+from flask_admin.contrib.sqla import ModelView
+
 
 
 app = Flask(__name__)
@@ -64,18 +67,33 @@ class Course(db.Model):
     #     self.capacity = capacity
 
 
+
+
+
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+class UserAdmin(ModelView):
+    form_excluded_columns = ('password_hash',  'courses_taught')
+
+    form_extra_fields = {
+        'password': PasswordField('Password')
+    }
+
+    def on_model_change(self, form, model, is_created):
+        if form.password.data:
+            model.password_hash = generate_password_hash(form.password.data)
 
 
 from flask_admin.contrib.sqla import ModelView
 app.secret_key = 'super secret key'
 
 admin = Admin(app, name='Admin View')
-admin.add_view(ModelView(User,db.session))
-admin.add_view(ModelView(Course, db.session))
+admin.add_view(UserAdmin(User,db.session))
+admin.add_view(UserAdmin(Course, db.session))
 
 @app.route('/')
 def index():
@@ -190,47 +208,30 @@ def teacher_course(course_id):
         flash('You do not teach this course.', 'alert')
         return redirect(url_for('teacher_courses'))
 
-    # if request.method == 'POST':
-    #     student_id = int(request.form['student_id'])
-    #     grade = (request.form.get('grade') or '').strip()
-    #     print(grade)
-
-    #     # ensure the student is actually enrolled
-    #     exists = db.session.execute(
-    #         select(enrollment_table.c.student_id)
-    #         .where(and_(enrollment_table.c.student_id == student_id,
-    #                     enrollment_table.c.course_id  == course_id))
-    #     ).first()
-    #     if not exists:
-    #         flash('Student is not enrolled in this course.', 'alert')
-    #         return redirect(url_for('teacher_course', course_id=course_id))
-
-    #     # update the grade in the enrollment row
-    #     db.session.execute(
-    #         enrollment_table.update()
-    #         .where(and_(enrollment_table.c.student_id == student_id,
-    #                     enrollment_table.c.course_id  == course_id))
-    #         .values(grade=grade if grade else None)
-    #     )
-    #     db.session.commit()
-    #     flash('Grade saved!')
-    #     return redirect(url_for('teacher_course', course_id=course_id))
-    
     if request.method == 'POST':
-        for student in course.students:
-            grade_field = f'grade_{student.id}'
-            grade = request.form.get(grade_field, '').strip()
-            db.session.execute(
-                enrollment_table.update()
-                .where(
-                    (enrollment_table.c.student_id == student.id) & 
-                    (enrollment_table.c.course_id == course_id)
-                )
-                .values(grade=grade if grade else None)
-            )
-        db.session.commit()
-        flash('All grades saved!')
+        student_id = int(request.form['student_id'])
+        grade = (request.form.get('grade') or '').strip()
+        
 
+        # ensure the student is actually enrolled
+        exists = db.session.execute(
+            select(enrollment_table.c.student_id)
+            .where(and_(enrollment_table.c.student_id == student_id,
+                        enrollment_table.c.course_id  == course_id))
+        ).first()
+        if not exists:
+            flash('Student is not enrolled in this course.', 'alert')
+            return redirect(url_for('teacher_course', course_id=course_id))
+
+        # update the grade in the enrollment row
+        db.session.execute(
+            enrollment_table.update()
+            .where(and_(enrollment_table.c.student_id == student_id,
+                        enrollment_table.c.course_id  == course_id))
+            .values(grade=grade if grade else None)
+        )
+        db.session.commit()
+        flash('Grade saved!')
         return redirect(url_for('teacher_course', course_id=course_id))
 
     # build grades_map from the enrollment table for this course
