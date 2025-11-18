@@ -5,43 +5,56 @@
   <title>{{ course.name }}</title>
 </head>
 <body>
-  <div class="topbar">
-    <a href="{{ url_for('teacher_courses') }}">&#8592; Back</a>
-    <span>{{ course.name }}</span>
-    <a href="{{ url_for('logout') }}">Sign out</a>
-  </div>
+    
+    <!-- <form action="{{ url_for('logout') }}" method="GET"></form>
+    <button type="submit">Log Out</button>
+</form> -->
 
-  <h1>{{ course.name }}</h1>
+{% extends "base.html" %}
+{% block title %}Teacher Courses{% endblock %}
 
-  {% if course.students.count() == 0 %}
-    <p>No students enrolled.</p>
-  {% else %}
-  <table>
-    <thead>
-      <tr>
-        <th>Student Name</th>
-        <th>Grade</th>
-        <th>Save</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for s in course.students %}
-      {% set g = grades_map.get((s.id, course.id)) %}
-      <tr>
-        <td>{{ s.name }}</td>
-        <td>
-          <form method="post" action="{{ url_for('teacher_course', course_id=course.id) }}">
-            <input type="hidden" name="student_id" value="{{ s.id }}">
-            <input type="text"   name="grade" value="{{ g if g is not none else '' }}" placeholder="e.g., 92 or A-">
-        </td>
-        <td>
-            <button type="submit">Save</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% endif %}
+{% block content %}
+
+
+<h1>{{ course.name }}</h1>
+
+{% if course.students.count() == 0 %}
+<p>No students enrolled.</p>
+{% else %}
+<form method="post" action="{{ url_for('teacher_course', course_id=course.id) }}">
+    <table>
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in course.students %}
+            {% set g = grades_map.get((s.id, course.id)) %}
+            <tr>
+                <td>{{ s.name }}</td>
+                <td>
+                    <input type="hidden" name="student_id" value="{{ s.id }}">
+                    <input type="text"   name="grade" value="{{ g if g is not none else '' }}" placeholder="e.g., 92 or A-">
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit">Save</button>
+
+    
+</form>
+
+<form action="{{ url_for('teacher_courses') }}" method="GET">
+    <button class="login-button" type="submit">Back</button>
+</form>
+
+{% endif %}
+<form action="{{ url_for('logout') }}" method="GET">
+    <button type="submit">Log Out</button>
+</form>
+{% endblock %}
 </body>
 </html>

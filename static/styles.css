@@ -114,4 +114,27 @@ button{
 
 }
 
+.topbar { 
+    display: flex; 
+    justify-content: flex-end; 
+    align-items: center; 
+    padding: 8px; 
+}
+.topbar a, .topbar form { 
+    margin-left: 1em; 
+}
 
+.welcome-message {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.logout-button form, .logout-button button{
+    margin-right: 1em;
+    border-radius: 1rem;
+    width: 100px;
+    height: 40px;
+    justify-content: flex-end;
+}
